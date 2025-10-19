@@ -20185,8 +20185,8 @@
                             stressDetails = `
                                 <div class="mt-4">
                                     <!-- Performance Summary -->
-                                    <div class="mb-4 p-3 rounded-lg" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1)); border: 1px solid rgba(59, 130, 246, 0.2);">
-                                        <div class="flex items-center justify-between mb-2">
+                                    <div class="mb-2 p-1.5 rounded-lg" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1)); border: 1px solid rgba(59, 130, 246, 0.2);">
+                                        <div class="flex items-center justify-between mb-1">
                                             <h6 class="font-semibold text-sm" style="color: var(--text-primary);">Performance Comparison</h6>
                                             <span class="text-xs px-2 py-1 rounded-full" style="background-color: ${performanceDiff > 0 ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'}; color: ${performanceDiff > 0 ? '#10b981' : '#ef4444'};">
                                                 ${performanceDiff > 0 ? 'Better under stress' : 'Worse under stress'}
@@ -20200,8 +20200,8 @@
                                     <!-- Detailed Comparison Cards -->
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <!-- High Volatility Card -->
-                                        <div class="p-4 rounded-xl border-2 transition-all duration-200 hover:shadow-lg" style="border-color: ${highVolColor}; background: ${highVolBgColor};">
-                                            <div class="flex items-center justify-between mb-3">
+                                        <div class="p-2 rounded-xl border-2 transition-all duration-200 hover:shadow-lg" style="border-color: ${highVolColor}; background: ${highVolBgColor};">
+                                            <div class="flex items-center justify-between mb-1">
                                                 <div class="flex items-center">
                                                     <div class="w-3 h-3 rounded-full mr-2" style="background-color: ${highVolColor};"></div>
                                                     <h6 class="font-semibold text-sm" style="color: var(--text-primary);">High Volatility Days</h6>
@@ -20209,7 +20209,7 @@
                                                 <span class="text-lg">${highVolIcon}</span>
                                             </div>
                                             
-                                            <div class="space-y-2">
+                                            <div class="space-y-1">
                                                 <div class="flex justify-between items-center">
                                                     <span class="text-xs font-medium" style="color: var(--text-secondary);">Average P&L</span>
                                                     <span class="text-sm font-bold" style="color: ${highVolColor};">
@@ -20232,8 +20232,8 @@
                                         </div>
                                         
                                         <!-- Low Volatility Card -->
-                                        <div class="p-4 rounded-xl border-2 transition-all duration-200 hover:shadow-lg" style="border-color: ${lowVolColor}; background: ${lowVolBgColor};">
-                                            <div class="flex items-center justify-between mb-3">
+                                        <div class="p-2 rounded-xl border-2 transition-all duration-200 hover:shadow-lg" style="border-color: ${lowVolColor}; background: ${lowVolBgColor};">
+                                            <div class="flex items-center justify-between mb-1">
                                                 <div class="flex items-center">
                                                     <div class="w-3 h-3 rounded-full mr-2" style="background-color: ${lowVolColor};"></div>
                                                     <h6 class="font-semibold text-sm" style="color: var(--text-primary);">Low Volatility Days</h6>
@@ -20241,7 +20241,7 @@
                                                 <span class="text-lg">${lowVolIcon}</span>
                                             </div>
                                             
-                                            <div class="space-y-2">
+                                            <div class="space-y-1">
                                                 <div class="flex justify-between items-center">
                                                     <span class="text-xs font-medium" style="color: var(--text-secondary);">Average P&L</span>
                                                     <span class="text-sm font-bold" style="color: ${lowVolColor};">
