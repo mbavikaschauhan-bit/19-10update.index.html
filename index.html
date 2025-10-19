@@ -1528,8 +1528,19 @@
                                <h3 class="text-xl font-bold" style="color: var(--text-primary);">Top Trades</h3>
                                <a href="#" data-page="trade-history" class="nav-item text-sm font-medium text-blue-600 hover:underline">View All Trades</a>
                             </div>
-                            <div id="top-trades-widget" class="space-y-2">
-                                <!-- Top trades will be rendered here -->
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <div class="space-y-2">
+                                    <h4 class="text-lg font-semibold mb-3" style="color: var(--text-primary);">Top 5 Winners</h4>
+                                    <div id="dashboard-top-winners" class="space-y-2">
+                                        <!-- Top winners will be rendered here -->
+                                    </div>
+                                </div>
+                                <div class="space-y-2">
+                                    <h4 class="text-lg font-semibold mb-3" style="color: var(--text-primary);">Top 5 Losers</h4>
+                                    <div id="dashboard-top-losers" class="space-y-2">
+                                        <!-- Top losers will be rendered here -->
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -3028,22 +3039,6 @@
                                     <h3 class="text-xl font-bold mb-4" style="color: var(--text-primary);">Behavior & Psychology</h3>
                                     <div id="ai-behavior-insights" class="space-y-4">
                                         <!-- Behavior insights will be dynamically inserted here -->
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Performance Section -->
-                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                                <div class="p-6 rounded-lg shadow-sm" style="background-color: var(--bg-primary); border: 1px solid var(--border-color);">
-                                    <h3 class="text-xl font-bold mb-4" style="color: var(--text-primary);">Top 5 Winners</h3>
-                                    <div id="ai-top-winners" class="space-y-2">
-                                        <!-- Top winners will be dynamically inserted here -->
-                                    </div>
-                                </div>
-                                <div class="p-6 rounded-lg shadow-sm" style="background-color: var(--bg-primary); border: 1px solid var(--border-color);">
-                                    <h3 class="text-xl font-bold mb-4" style="color: var(--text-primary);">Top 5 Losers</h3>
-                                    <div id="ai-top-losers" class="space-y-2">
-                                        <!-- Top losers will be dynamically inserted here -->
                                     </div>
                                 </div>
                             </div>
@@ -11149,6 +11144,8 @@
                 
                 // Update top trades (moved outside to avoid duplication)
                 renderTopTrades(5);
+                renderDashboardTopWinners();
+                renderDashboardTopLosers();
                 
             } catch (e) {
                 console.error('renderOpenPositionsOverview error', e);
@@ -11260,6 +11257,103 @@
                 console.error('renderTopTrades error', e);
             }
         };
+
+        // Render Top 5 Winners for Dashboard
+        const renderDashboardTopWinners = () => {
+            try {
+                const trades = appState.trades || [];
+                const closedTrades = trades.filter(t => t.exit_price && t.exit_date);
+                
+                // Filter winners (positive P&L) and sort by P&L (best first)
+                const winners = closedTrades
+                    .map(trade => ({ ...trade, pnl: calculateNetPnl(trade) }))
+                    .filter(trade => trade.pnl > 0)
+                    .sort((a, b) => b.pnl - a.pnl)
+                    .slice(0, 5);
+                
+                const container = document.getElementById('dashboard-top-winners');
+                if (container) {
+                    if (winners.length === 0) {
+                        container.innerHTML = '<div class="flex-1 flex items-center justify-center"><p class="text-center text-sm" style="color: var(--text-secondary);">No profitable trades yet.</p></div>';
+                        return;
+                    }
+                    
+                    container.innerHTML = winners.map((trade, index) => {
+                        const pnl = trade.pnl;
+                        const pnlClass = 'text-green-500';
+                        const pnlSign = '+';
+                        
+                        return `
+                            <div class="flex justify-between items-center p-3 rounded-md" style="background-color: var(--bg-secondary); border: 1px solid var(--border-color);">
+                                <div class="flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="font-semibold text-sm" style="color: var(--text-primary);">${trade.asset || 'Unknown'}</p>
+                                            <p class="text-xs" style="color: var(--text-secondary);">${trade.exit_date ? new Date(trade.exit_date).toLocaleDateString() : ''}</p>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="font-bold text-sm ${pnlClass}">${pnlSign}${formatCurrency(pnl)}</p>
+                                            <p class="text-xs" style="color: var(--text-muted);">${trade.quantity || 0} qty</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            } catch (e) {
+                console.error('renderDashboardTopWinners error', e);
+            }
+        };
+
+        // Render Top 5 Losers for Dashboard
+        const renderDashboardTopLosers = () => {
+            try {
+                const trades = appState.trades || [];
+                const closedTrades = trades.filter(t => t.exit_price && t.exit_date);
+                
+                // Filter losers (negative P&L) and sort by P&L (worst first)
+                const losers = closedTrades
+                    .map(trade => ({ ...trade, pnl: calculateNetPnl(trade) }))
+                    .filter(trade => trade.pnl < 0)
+                    .sort((a, b) => a.pnl - b.pnl)
+                    .slice(0, 5);
+                
+                const container = document.getElementById('dashboard-top-losers');
+                if (container) {
+                    if (losers.length === 0) {
+                        container.innerHTML = '<div class="flex-1 flex items-center justify-center"><p class="text-center text-sm" style="color: var(--text-secondary);">No losing trades yet.</p></div>';
+                        return;
+                    }
+                    
+                    container.innerHTML = losers.map((trade, index) => {
+                        const pnl = trade.pnl;
+                        const pnlClass = 'text-red-500';
+                        const pnlSign = '';
+                        
+                        return `
+                            <div class="flex justify-between items-center p-3 rounded-md" style="background-color: var(--bg-secondary); border: 1px solid var(--border-color);">
+                                <div class="flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="font-semibold text-sm" style="color: var(--text-primary);">${trade.asset || 'Unknown'}</p>
+                                            <p class="text-xs" style="color: var(--text-secondary);">${trade.exit_date ? new Date(trade.exit_date).toLocaleDateString() : ''}</p>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="font-bold text-sm ${pnlClass}">${pnlSign}${formatCurrency(pnl)}</p>
+                                            <p class="text-xs" style="color: var(--text-muted);">${trade.quantity || 0} qty</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            } catch (e) {
+                console.error('renderDashboardTopLosers error', e);
+            }
+        };
+
         // Store chart instances to avoid duplicates
         const chartInstances = {};
         
@@ -20159,53 +20253,6 @@
                     return { ...trade, pnl };
                 });
                 
-                // Top 5 Winners
-                const topWinners = tradesWithPnL
-                    .filter(t => t.pnl > 0)
-                    .sort((a, b) => b.pnl - a.pnl)
-                    .slice(0, 5);
-                
-                // Top 5 Losers
-                const topLosers = tradesWithPnL
-                    .filter(t => t.pnl < 0)
-                    .sort((a, b) => a.pnl - b.pnl)
-                    .slice(0, 5);
-                
-                // Update Top Winners
-                const winnersContainer = document.getElementById('ai-top-winners');
-                if (winnersContainer) {
-                    if (topWinners.length === 0) {
-                        winnersContainer.innerHTML = '<p class="text-center text-sm" style="color: var(--text-secondary);">No profitable trades yet</p>';
-                    } else {
-                        winnersContainer.innerHTML = topWinners.map((trade, index) => `
-                            <div class="flex justify-between items-center py-1 ${index < topWinners.length - 1 ? 'border-b' : ''}" style="border-color: var(--border-color);">
-                                <div>
-                                    <span class="font-medium" style="color: var(--text-primary);">${trade.asset || 'Unknown'}</span>
-                                    <span class="text-sm ml-2" style="color: var(--text-secondary);">${trade.exit_date ? new Date(trade.exit_date).toLocaleDateString() : ''}</span>
-                                </div>
-                                <span class="font-semibold text-green-600">${formatCurrency(trade.pnl)}</span>
-                            </div>
-                        `).join('');
-                    }
-                }
-                
-                // Update Top Losers
-                const losersContainer = document.getElementById('ai-top-losers');
-                if (losersContainer) {
-                    if (topLosers.length === 0) {
-                        losersContainer.innerHTML = '<p class="text-center text-sm" style="color: var(--text-secondary);">No losing trades yet</p>';
-                    } else {
-                        losersContainer.innerHTML = topLosers.map((trade, index) => `
-                            <div class="flex justify-between items-center py-1 ${index < topLosers.length - 1 ? 'border-b' : ''}" style="border-color: var(--border-color);">
-                                <div>
-                                    <span class="font-medium" style="color: var(--text-primary);">${trade.asset || 'Unknown'}</span>
-                                    <span class="text-sm ml-2" style="color: var(--text-secondary);">${trade.exit_date ? new Date(trade.exit_date).toLocaleDateString() : ''}</span>
-                                </div>
-                                <span class="font-semibold text-red-600">${formatCurrency(trade.pnl)}</span>
-                            </div>
-                        `).join('');
-                    }
-                }
                 
             } catch (error) {
                 console.error('AI Analyst: Error updating performance sections', error);
@@ -20876,6 +20923,10 @@
                             }).join('');
                         }
                     }
+                    
+                    // Also update the new dashboard winners and losers
+                    renderDashboardTopWinners();
+                    renderDashboardTopLosers();
                 } catch (e) {
                     console.error('updateTopTradesWithFilter error', e);
                 }
