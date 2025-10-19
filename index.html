@@ -6153,8 +6153,8 @@
                 if (tbody && appState.trades && appState.trades.length > 1000) {
                     tbody.innerHTML = '<tr><td colspan="10" class="text-center py-4">Loading trades...</td></tr>';
                 }
-                // Use requestAnimationFrame for smoother rendering
-                requestAnimationFrame(() => renderTradeHistory());
+                // Use setTimeout for faster navigation response
+                setTimeout(() => renderTradeHistory(), 0);
             }
             if (pageId === 'fund-management') {
                 renderFundManagement();
@@ -6165,8 +6165,8 @@
                 if (statementBody && appState.trades && appState.trades.length > 1000) {
                     statementBody.innerHTML = '<tr><td colspan="15" class="text-center py-4">Loading statement...</td></tr>';
                 }
-                // Use requestAnimationFrame for smoother rendering
-                requestAnimationFrame(() => renderStatement());
+                // Use setTimeout for faster navigation response
+                setTimeout(() => renderStatement(), 0);
             }
             if (pageId === 'reports') {
                 renderReports();
@@ -9959,7 +9959,7 @@
                 return;
             }
             
-            // Debounce rendering by 5ms to prevent jitter (reduced from 10ms)
+            // Debounce rendering by 1ms to prevent jitter (optimized for faster response)
             statementRenderTimeout = setTimeout(() => {
                 try {
                     // Prevent multiple simultaneous renders
